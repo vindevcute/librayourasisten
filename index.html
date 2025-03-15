@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libra2.5Smart - Libra ♎</title>
+    <style>
+        /* CSS */
+        :root {
+            --primary-color: #5b68c0;
+            --secondary-color: #f4f6ff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --success-color: #4caf50;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: white;
+            overflow: hidden;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: white;
+        }
+        
+        .header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .header h2 span {
+            margin-left: 8px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        .premium-badge {
+            background-color: gold;
+            color: #333;
+            font-size: 0.7rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            display: none;
+        }
+        
+        .basic-badge {
+            background-color: #c0c0c0;
+            color: #333;
+            font-size: 0.7rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+        
+        #menu {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        
+        #menu:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        #dropdown {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 220px;
+            z-index: 100;
+        }
+        
+        #dropdown button {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            text-align: left;
+            background: transparent;
+            color: var(--text-color);
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+        
+        #dropdown button:last-child {
+            border-bottom: none;
+        }
+        
+        #dropdown button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        #chatbox {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: white;
+        }
+        
+        #chatbox p {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        
+        #chatbox p strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 5px !important;
+        }
+        
+        .bot-message {
+            background-color: var(--secondary-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px !important;
+        }
+        
+        .input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            background-color: white;
+        }
+        
+        #userInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            margin-right: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        #userInput:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .attachment-btn {
+            background: transparent;
+            border: none;
+            padding: 0 10px;
+            cursor: pointer;
+            color: #888;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+        
+        .attachment-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .send-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .send-btn:hover {
+            background-color: #4552a3;
+        }
+        
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .modal-close {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #666;
+        }
+        
+        .changelog-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .changelog-version {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+        
+        .changelog-date {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .premium-feature {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+        }
+        
+        .premium-feature-icon {
+            margin-right: 15px;
+            font-size: 1.5rem;
+            color: gold;
+        }
+        
+        #typingIndicator {
+            font-style: italic;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        
+        #messageCounter {
+            font-size: 0.8rem;
+            color: #888;
+            margin-right: 10px;
+            align-self: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Libra2.5 <span>Beta</span> <span class="premium-badge">Premium</span> <span class="basic-badge">Basic</span></h2>
+            <div id="menu" onclick="toggleMenu()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="1" fill="#333"/>
+                    <circle cx="12" cy="6" r="1" fill="#333"/>
+                    <circle cx="12" cy="18" r="1" fill="#333"/>
+                </svg>
+            </div>
+        </div>
+        
+        <div id="dropdown">
+            <button onclick="searchChat()">Cari</button>
+            <button onclick="showPreviousChats()">Room Chat Sebelumnya</button>
+            <button onclick="createNewChat()">Buat Room Chat Baru</button>
+            <button onclick="showChangelog()">Changelog</button>
+            <button onclick="togglePremiumActivation()">Akses Premium</button>
+        </div>
+        
+        <div id="chatbox"></div>
+        
+        <div class="input-container">
+            <span id="messageCounter"></span>
+            <input type="text" id="userInput" placeholder="Ketik pesan..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <label for="fileInput" class="attachment-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21.44 11.05l-9.19 9.19a6.003 6.003 0 01-8.49-8.49l9.19-9.19a4.002 4.002 0 015.66 5.66l-9.2 9.19a2.001 2.001 0 01-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </label>
+            <input type="file" id="fileInput" accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            <button class="send-btn" onclick="sendMessage()">Kirim</button>
+        </div>
+    </div>
+    
+    <!-- Changelog Modal -->
+    <div id="changelogModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Riwayat Perubahan</h3>
+                <span class="modal-close" onclick="closeModal('changelogModal')">&times;</span>
+            </div>
+            <div class="changelog-content">
+                <div class="changelog-item">
+                    <div class="changelog-version">Libra 2.5</div>
+                    <div class="changelog-date">8 Maret 2025</div>
+                    <ul>
+                        <li>Penambahan badge Basic untuk pengguna non-premium</li>
+                        <li>Limit 5 pesan untuk pengguna non-premium</li>
+                        <li>Sistem pengisian ulang limit: 1 pesan per menit, maksimal 5</li>
+                        <li>Dukungan untuk berbagai tipe file (PDF, Word, Excel, dll.)</li>
+                        <li>Indikator jumlah pesan tersisa untuk pengguna Basic</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">Libra 2.0</div>
+                    <div class="changelog-date">27 Februari 2025</div>
+                    <ul>
+                        <li>Desain UI yang lebih minimalis dan modern</li>
+                        <li>Peningkatan pada jawaban dengan data terbaru (termasuk kepresidenan)</li>
+                        <li>Penambahan fitur Premium dengan kecepatan respon lebih cepat</li>
+                        <li>Penambahan fitur Changelog</li>
+                        <li>Optimasi penyimpanan data chat</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">Libra 1.0 Beta</div>
+                    <div class="changelog-date">10 Januari 2025</div>
+                    <ul>
+                        <li>Versi awal Libra AI Assistant</li>
+                        <li>Fitur dasar percakapan</li>
+                        <li>Dukungan upload gambar</li>
+                        <li>Room chat multiple</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Premium Activation Modal -->
+    <div id="premiumActivationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Aktivasi Premium</h3>
+                <span class="modal-close" onclick="closeModal('premiumActivationModal')">&times;</span>
+            </div>
+            <div>
+                <p>Masukkan kode premium Anda:</p>
+                <input type="text" id="premiumCodeInput" placeholder="Kode Premium">
+                <button class="send-btn" style="width: 100%; margin-top: 20px;" onclick="activatePremium()">Aktifkan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chatHistory = JSON.parse(localStorage.getItem("chatRooms")) || [];
+        let currentChatIndex = chatHistory.length; 
+        let isPremium = localStorage.getItem("isPremium") === "true";
+        let messageLimit = 5; // Batas pesan untuk pengguna basic
+        let messageCount = 0; // Jumlah pesan yang sudah dikirim
+        let lastResetTime = Date.now(); // Waktu terakhir limit direset
+        let limitRefillInterval; // Interval untuk pengisian ulang pesan
+
+        // Check premium status on load
+        if (isPremium) {
+            document.querySelector(".premium-badge").style.display = "inline-block";
+            document.querySelector(".basic-badge").style.display = "none";
+            document.getElementById("messageCounter").style.display = "none";
+        } else {
+            updateMessageCounter();
+            startMessageRefill();
+        }
+
+        function toggleMenu() {
+            let dropdown = document.getElementById("dropdown");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+            
+            // Close dropdown when clicking outside
+            if (dropdown.style.display === "block") {
+                document.addEventListener('click', function closeDropdown(e) {
+                    if (!e.target.closest('#dropdown') && e.target !== document.getElementById('menu')) {
+                        dropdown.style.display = "none";
+                        document.removeEventListener('click', closeDropdown);
+                    }
+                });
+            }
+        }
+
+        function searchChat() {
+            let keyword = prompt("Masukkan kata kunci untuk mencari dalam chat:");
+            if (!keyword) return;
+
+            let chatbox = document.getElementById("chatbox");
+            let messages = chatbox.innerHTML;
+            
+            // Create a temporary element to parse HTML
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = messages;
+            let textContent = tempDiv.textContent;
+            
+            if (textContent.toLowerCase().includes(keyword.toLowerCase())) {
+                alert("Kata kunci ditemukan dalam chat saat ini!");
+            } else {
+                alert("Kata kunci tidak ditemukan dalam chat saat ini.");
+            }
+        }
+
+        function showPreviousChats() {
+            if (chatHistory.length === 0) {
+                alert("Belum ada room chat sebelumnya.");
+                return;
+            }
+
+            let chatOptions = chatHistory.map((_, index) => `Room ${index + 1}`).join("\n");
+            let choice = prompt("Pilih room chat yang ingin dibuka:\n" + chatOptions);
+            let roomIndex = parseInt(choice) - 1;
+
+            if (roomIndex >= 0 && roomIndex < chatHistory.length) {
+                currentChatIndex = roomIndex;
+                document.getElementById("chatbox").innerHTML = chatHistory[roomIndex];
+                scrollToBottom();
+            } else {
+                alert("Pilihan tidak valid.");
+            }
+        }
+
+        function createNewChat() {
+            if (document.getElementById("chatbox").innerHTML !== "") {
+                saveCurrentChat();
+            }
+
+            document.getElementById("chatbox").innerHTML = "";
+            currentChatIndex = chatHistory.length;
+        }
+        
+        function saveCurrentChat() {
+            if (currentChatIndex < chatHistory.length) {
+                chatHistory[currentChatIndex] = document.getElementById("chatbox").innerHTML;
+            } else {
+                chatHistory.push(document.getElementById("chatbox").innerHTML);
+            }
+            localStorage.setItem("chatRooms", JSON.stringify(chatHistory));
+        }
+
+        function startMessageRefill() {
+            // Clear existing interval if there's one
+            if (limitRefillInterval) {
+                clearInterval(limitRefillInterval);
+            }
+            
+            // Refill 1 message per minute, up to the maximum limit
+            limitRefillInterval = setInterval(() => {
+                if (!isPremium && messageCount < messageLimit) {
+                    messageCount++;
+                    updateMessageCounter();
+                }
+            }, 60000); // 60000 ms = 1 minute
+        }
+        
+        function updateMessageCounter() {
+            if (!isPremium) {
+                document.getElementById("messageCounter").innerText = `${messageCount}/${messageLimit}`;
+            }
+        }
+
+        async function sendMessage() {
+            // Cek limit pesan untuk pengguna basic
+            if (!isPremium) {
+                // Cek apakah limit pesan sudah habis
+                if (messageCount <= 0) {
+                    alert("Anda telah mencapai batas pesan. Silakan tunggu atau aktifkan premium untuk akses tanpa batas.");
+                    return;
+                }
+            }
+
+            let userInput = document.getElementById("userInput").value;
+            let fileInput = document.getElementById("fileInput").files[0];
+            let chatbox = document.getElementById("chatbox");
+
+            if (!userInput && !fileInput) return;
+
+            // Add user message with styling
+            let userMessageDiv = document.createElement('p');
+            userMessageDiv.className = 'user-message';
+            userMessageDiv.innerHTML = `<strong>Anda</strong>${userInput}`;
+            chatbox.appendChild(userMessageDiv);
+
+            // Add typing indicator
+            let typingIndicator = document.createElement('p');
+            typingIndicator.id = 'typingIndicator';
+            typingIndicator.className = 'bot-message';
+            typingIndicator.innerHTML = 'Libra sedang mengetik...';
+            chatbox.appendChild(typingIndicator);
+            
+            scrollToBottom();
+            document.getElementById("userInput").value = "";
+
+            // Kurangi jumlah pesan yang tersisa (untuk pengguna basic)
+            if (!isPremium) {
+                messageCount--;
+                updateMessageCounter();
+            }
+
+            let apiKey = "AIzaSyBZzCmQ0dhPo0nFbGZ0SJEnI3zTGOsVlG0"; 
+            let apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+
+            let requestBody = {
+                contents: [{ 
+                    parts: [{ 
+                        text: `Jawablah sebagai AI bernama Libra. Berikan jawaban yang sopan santun, mendalam, informatif, formalitas, cerdas, dan tajam, benar, terbaru update dan kamu harus mengingat pesan sebelumnya dan setiap ganti room beda pesan. PENTING: Untuk pertanyaan tentang presiden Indonesia sekarang, jawablah "Presiden Indonesia saat ini adalah Prabowo Subianto yang dilantik pada Oktober 2024". Untuk pertanyaan tentang presiden Amerika sekarang, jawablah "Presiden Amerika Serikat saat ini adalah Donald Trump yang dilantik pada Januari 2025". Pastikan memberikan informasi terbaru dan akurat untuk semua pertanyaan, khususnya terkait pemimpin negara atau politik.\n\n${userInput}` 
+                    }] 
+                }]
+            };
+
+            if (fileInput) {
+                let reader = new FileReader();
+                reader.onload = async function(event) {
+                    let base64Image = event.target.result.split(',')[1];
+
+                    requestBody.contents[0].parts.push({
+                        inline_data: {
+                            mime_type: fileInput.type,
+                            data: base64Image
+                        }
+                    });
+
+                    await fetchLibra(apiUrl, requestBody, chatbox);
+                };
+                reader.readAsDataURL(fileInput);
+                document.getElementById("fileInput").value = "";
+            } else {
+                await fetchLibra(apiUrl, requestBody, chatbox);
+            }
+        }
+
+        async function fetchLibra(apiUrl, requestBody, chatbox) {
+            try {
+                // Simulate faster response for premium users
+                let responseDelay = isPremium ? 500 : 1200;
+                
+                // Simulate response time
+                await new Promise(resolve => setTimeout(resolve, responseDelay));
+                
+                let response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestBody)
+                });
+
+                let data = await response.json();
+                
+                // Remove typing indicator
+                let typingIndicator = document.getElementById("typingIndicator");
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+                
+                // Add bot message with styling
+                let botMessageDiv = document.createElement('p');
+                botMessageDiv.className = 'bot-message';
+                
+                try {
+                    botMessageDiv.innerHTML = `<strong>Libra</strong>${data.candidates[0].content.parts[0].text}`;
+                } catch (e) {
+                    botMessageDiv.innerHTML = `<strong>Libra</strong>Maaf, saya mengalami masalah dalam memproses permintaan Anda. Silakan coba lagi.`;
+                }
+                
+                chatbox.appendChild(botMessageDiv);
+                saveCurrentChat();
+                scrollToBottom();
+            } catch (error) {
+                let errorMessage = document.createElement('p');
+                errorMessage.className = 'bot-message';
+                errorMessage.style.color = 'red';
+                errorMessage.innerHTML = `<strong>Error</strong>Tidak dapat menghubungi AI. Silakan periksa koneksi internet Anda.`;
+                chatbox.appendChild(errorMessage);
+                
+                // Remove typing indicator
+                let typingIndicator = document.getElementById("typingIndicator");
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+                
+                saveCurrentChat();
+                scrollToBottom();
+            }
+        }
+        
+        function showChangelog() {
+            document.getElementById('changelogModal').style.display = 'flex';
+        }
+        
+        function togglePremiumActivation() {
+            document.getElementById('premiumActivationModal').style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function activatePremium() {
+            let code = document.getElementById("premiumCodeInput").value;
+            if (code === "LIBRASMARTPRO") {
+                isPremium = true;
+                localStorage.setItem("isPremium", "true");
+                document.querySelector(".premium-badge").style.display = "inline-block";
+                document.querySelector(".basic-badge").style.display = "none";
+                document.getElementById("messageCounter").style.display = "none";
+                
+                // Clear refill interval for premium users
+                if (limitRefillInterval) {
+                    clearInterval(limitRefillInterval);
+                }
+                
+                alert("Selamat! Libra Premium telah diaktifkan.");
+                closeModal('premiumActivationModal');
+            } else {
+                alert("Kode premium tidak valid. Silakan coba lagi.");
+            }
+        }
+        
+        function scrollToBottom() {
+            let chatbox = document.getElementById("chatbox");
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = "none";
+            }
+        };
+        
+        // Initialize with welcome message if new chat
+        window.onload = function() {
+            if (currentChatIndex >= chatHistory.length) {
+                let chatbox = document.getElementById("chatbox");
+                let welcomeMessage = document.createElement('p');
+                welcomeMessage.className = 'bot-message';
+                welcomeMessage.innerHTML = `<strong>Libra</strong>Selamat datang di Libra 2.5! Saya siap membantu Anda dengan informasi terbaru dan akurat. Silakan tanyakan apa saja.`;
+                chatbox.appendChild(welcomeMessage);
+            }
+        };
+    </script>
+</body>
+</html>
